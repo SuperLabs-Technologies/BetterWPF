@@ -1,30 +1,26 @@
-private IntPtr HwndSourceHook(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam, ref bool handled)
+// Use MaximizeButton.cs to remove the windows styled maximize button when clicking
+public void SnapLayout(int code, Rect rect) 
 {
-    switch (msg)
+    if(code == Winuser.WM.NCHITTEST)
     {
-        case Winuser.WM.NCHITTEST:
+        if (Environment.OSVersion.Version.Build >= 20000)
         {
-            if (Environment.OSVersion.Version.Build >= 20000)
+            try
             {
-                try
-                {
-                    int x = lparam.ToInt32() & 0xffff;
-                    int y = lparam.ToInt32() >> 16;
+                int x = lparam.ToInt32() & 0xffff;
+                int y = lparam.ToInt32() >> 16;
 
-                    var rect = ; // Relative to screen coordinates
-
-                    if (rect.Contains(new Point(x, y)))
-                    {
-                        handled = true;
-                        return new IntPtr(Winuser.HT.MAXBUTTON);
-                    }
-                }
-                catch (OverflowException)
+                if (rect.Contains(new Point(x, y)))
                 {
                     handled = true;
+                    return new IntPtr(Winuser.HT.MAXBUTTON);
                 }
             }
-            break;
+            catch (OverflowException)
+            {
+                handled = true;
+            }
         }
+        break;
     }
 }
